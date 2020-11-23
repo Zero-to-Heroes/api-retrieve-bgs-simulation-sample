@@ -26,6 +26,7 @@ export default async (event): Promise<any> => {
 				WHERE id = '${sampleId}'
 			`,
 		);
+		await mysqlBgs.end();
 		// console.log('ran query', dbResults);
 
 		if (!dbResults || dbResults.length === 0) {
