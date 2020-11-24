@@ -19,7 +19,7 @@ Resources:
         Properties:
             Handler: bgs-retrieve-simulation-sample.default
             Runtime: nodejs10.x
-            Timeout: 30
+            Timeout: 2
             MemorySize: 128
             CodeUri: ./dist/bgs-retrieve-simulation-sample
             # https://stackoverflow.com/questions/39144688/aws-lambda-invoke-not-calling-another-lambda-function-node-js
