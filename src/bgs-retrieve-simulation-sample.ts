@@ -14,48 +14,36 @@ const headers = {
 // the more traditional callback-style handler.
 // [1]: https://aws.amazon.com/blogs/compute/node-js-8-10-runtime-now-available-in-aws-lambda/
 export default async (event): Promise<any> => {
-	try {
-		// console.log('processing event', event);
-		const sampleId = event.pathParameters && event.pathParameters.proxy;
-		const escape = SqlString.escape;
-		const mysqlBgs = await getConnectionBgs();
+	// console.log('processing event', event);
+	const sampleId = event.pathParameters && event.pathParameters.proxy;
+	const escape = SqlString.escape;
+	const mysqlBgs = await getConnectionBgs();
 
-		// Check if this sample already exists in db
-		const dbResults: any[] = await mysqlBgs.query(
-			`
+	// Check if this sample already exists in db
+	const dbResults: any[] = await mysqlBgs.query(
+		`
 				SELECT sample FROM bgs_simulation_samples
 				WHERE id = ${escape(sampleId)}
 			`,
-		);
-		await mysqlBgs.end();
-		// console.log('ran query', dbResults);
+	);
+	await mysqlBgs.end();
+	// console.log('ran query', dbResults);
 
-		if (!dbResults || dbResults.length === 0) {
-			console.log('no match');
-			return {
-				statusCode: 404,
-				headers: headers,
-			};
-		}
-
-		const result: string = dbResults[0].sample;
-		// console.log('found sample', result);
-		const decoded = decode(result);
-		// console.log('returning results', decoded);
+	if (!dbResults || dbResults.length === 0) {
+		console.log('no match');
 		return {
-			statusCode: 200,
+			statusCode: 404,
 			headers: headers,
-			body: decoded,
 		};
-	} catch (e) {
-		console.error('issue saving sample', e);
-		const response = {
-			statusCode: 500,
-			headers: headers,
-			isBase64Encoded: false,
-			body: null,
-		};
-		console.log('sending back error reponse', response);
-		return response;
 	}
+
+	const result: string = dbResults[0].sample;
+	// console.log('found sample', result);
+	const decoded = decode(result);
+	// console.log('returning results', decoded);
+	return {
+		statusCode: 200,
+		headers: headers,
+		body: decoded,
+	};
 };
