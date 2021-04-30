@@ -14,7 +14,6 @@ const headers = {
 // the more traditional callback-style handler.
 // [1]: https://aws.amazon.com/blogs/compute/node-js-8-10-runtime-now-available-in-aws-lambda/
 export default async (event): Promise<any> => {
-	// console.log('processing event', event);
 	const sampleId = event.pathParameters && event.pathParameters.proxy;
 	const escape = SqlString.escape;
 	const mysqlBgs = await getConnectionBgs();
@@ -27,10 +26,8 @@ export default async (event): Promise<any> => {
 			`,
 	);
 	await mysqlBgs.end();
-	// console.log('ran query', dbResults);
 
 	if (!dbResults || dbResults.length === 0) {
-		console.log('no match');
 		return {
 			statusCode: 404,
 			headers: headers,
@@ -38,9 +35,7 @@ export default async (event): Promise<any> => {
 	}
 
 	const result: string = dbResults[0].sample;
-	// console.log('found sample', result);
 	const decoded = decode(result);
-	// console.log('returning results', decoded);
 	return {
 		statusCode: 200,
 		headers: headers,
