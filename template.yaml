@@ -18,7 +18,7 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             Handler: bgs-retrieve-simulation-sample.default
-            Runtime: nodejs10.x
+            Runtime: nodejs12.x
             Timeout: 2
             MemorySize: 128
             CodeUri: ./dist/bgs-retrieve-simulation-sample
