@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
+import { decode, getConnection } from '@firestone-hs/aws-lambda-utils';
 import SqlString from 'sqlstring';
-import { getConnection } from './services/rds';
-import { getConnection as getConnectionBgs } from './services/rds-bgs';
-import { decode } from './services/utils';
 
 const headers = {
 	'Access-Control-Allow-Origin': '*',
@@ -27,18 +25,6 @@ export default async (event): Promise<any> => {
 			`,
 	);
 	await mysql.end();
-
-	if (!dbResults.length) {
-		const mysqlBgs = await getConnectionBgs();
-		dbResults = await mysqlBgs.query(
-			`
-				SELECT sample FROM bgs_simulation_samples
-				WHERE id = ${escape(sampleId)}
-			`,
-		);
-		await mysqlBgs.end();
-	}
-
 	if (!dbResults || dbResults.length === 0) {
 		return {
 			statusCode: 404,
