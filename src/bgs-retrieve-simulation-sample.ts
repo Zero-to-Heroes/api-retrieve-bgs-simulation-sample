@@ -27,7 +27,6 @@ export default async (event): Promise<any> => {
 			`,
 	);
 	await mysql.end();
-	console.debug('got db results', sampleId, event, dbResults);
 	if (!dbResults || dbResults.length === 0) {
 		return {
 			statusCode: 404,
@@ -37,7 +36,6 @@ export default async (event): Promise<any> => {
 
 	const result: string = dbResults[0].sample;
 	const decoded = decode(result);
-	console.debug('decoded', decoded);
 	return {
 		statusCode: 200,
 		headers: headers,
