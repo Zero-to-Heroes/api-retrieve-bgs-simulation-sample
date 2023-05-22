@@ -13,18 +13,21 @@ const headers = {
 // the more traditional callback-style handler.
 // [1]: https://aws.amazon.com/blogs/compute/node-js-8-10-runtime-now-available-in-aws-lambda/
 export default async (event): Promise<any> => {
-	const sampleId = event.pathParameters && event.pathParameters.proxy;
+	const sampleId = event.requestContext?.http?.path?.length
+		? event.requestContext.http.path.split('/')[1]
+		: event.pathParameters && event.pathParameters.proxy;
 	const escape = SqlString.escape;
 
 	// Check if this sample already exists in db
 	const mysql = await getConnection();
-	let dbResults: any[] = await mysql.query(
+	const dbResults: any[] = await mysql.query(
 		`
 				SELECT sample FROM bgs_simulation_samples
 				WHERE id = ${escape(sampleId)}
 			`,
 	);
 	await mysql.end();
+	console.debug('got db results', sampleId, event, dbResults);
 	if (!dbResults || dbResults.length === 0) {
 		return {
 			statusCode: 404,
@@ -34,6 +37,7 @@ export default async (event): Promise<any> => {
 
 	const result: string = dbResults[0].sample;
 	const decoded = decode(result);
+	console.debug('decoded', decoded);
 	return {
 		statusCode: 200,
 		headers: headers,
