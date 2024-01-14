@@ -4,37 +4,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: API endpoint to retrieve a BGS simulation sample
 
-Globals:
-    Api:
-        # API Gateway regional endpoints
-        EndpointConfiguration: EDGE
-        Cors:
-            AllowMethods: "'*'"
-            AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-            AllowOrigin: "'*'"
-
 Resources:
-    RetrieveBgsSimulationSampleFunction:
-        Type: AWS::Serverless::Function
-        Properties:
-            Handler: bgs-retrieve-simulation-sample.default
-            Runtime: nodejs16.x
-            Timeout: 2
-            MemorySize: 128
-            CodeUri: ./dist/bgs-retrieve-simulation-sample
-            Policies:
-                - AWSLambdaVPCAccessExecutionRole
-                - AmazonSESFullAccess
-                - SecretsManagerReadWrite
-                - arn:aws:iam::478062583808:policy/CloudWatchPolicyForLambda # See https://stackoverflow.com/questions/51166504/disable-cloudwatch-to-monitor-logs-for-lambda-function
-            Tags:
-                LambdaName: api-retrieve-bgs-simulation-sample
-            Events:
-                GetMatchStatsResource:
-                    Type: Api
-                    Properties:
-                        Path: /{proxy+}
-                        Method: any
     RetrieveBgsSimulationSampleFunction2:
         Type: AWS::Serverless::Function
         Properties:
@@ -42,10 +12,13 @@ Resources:
             Runtime: nodejs16.x
             CodeUri: ./dist/bgs-retrieve-simulation-sample
             Timeout: 2
+            Layers:
+                - !Sub "arn:aws:lambda:${AWS::Region}:580247275435:layer:LambdaInsightsExtension:14"
             Policies:
                 - AWSLambdaVPCAccessExecutionRole
                 - SecretsManagerReadWrite
                 - AmazonSESFullAccess
+                - arn:aws:iam::aws:policy/CloudWatchLambdaInsightsExecutionRolePolicy
                 # - arn:aws:iam::478062583808:policy/CloudWatchPolicyForLambda # See https://stackoverflow.com/questions/51166504/disable-cloudwatch-to-monitor-logs-for-lambda-function
             Tags:
                 LambdaName: api-bgs-retrieve-simulation-sample-2
@@ -53,9 +26,3 @@ Resources:
             FunctionUrlConfig:
                 AuthType: NONE
 
-Outputs:
-    RetrieveBgsSimulationSampleApi:
-        Description: URL to retrieve a BGS simulation sample
-        Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/'
-        Export:
-            Name: RetrieveBgsSimulationSampleApi
