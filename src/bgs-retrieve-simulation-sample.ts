@@ -19,6 +19,7 @@ export default async (event): Promise<any> => {
 	const escape = SqlString.escape;
 
 	// Check if this sample already exists in db
+	console.debug('getting sample', sampleId);
 	const mysql = await getConnection();
 	const dbResults: any[] = await mysql.query(
 		`
@@ -35,7 +36,9 @@ export default async (event): Promise<any> => {
 	}
 
 	const result: string = dbResults[0].sample;
+	console.debug('retrieved sample');
 	const decoded = decode(result);
+	console.debug('decoded sample');
 	return {
 		statusCode: 200,
 		headers: headers,
